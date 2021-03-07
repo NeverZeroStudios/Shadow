@@ -1,6 +1,4 @@
 # Directories
 .vs/
-
-# Binaries
 bin/
 bin-int/
