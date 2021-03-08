@@ -1,14 +1,15 @@
 #include <Shadow.h>
 
-class Sandbox : public ShadowEngine::Application {
+class Sandbox : public Shadow::Application {
 public:
 	Sandbox() {
-		SHADOW_DEBUGGER::_INFO("Welcome to Shadow Engine");
+		SH_DEBUGGER_INFO("Welcome to Shadow Engine");
 	}
-	~Sandbox() {}
-
+	~Sandbox() {
+		SH_DEBUGGER_INFO("Closing Shadow Engine");
+	}
 };
 
-ShadowEngine::Application* ShadowEngine::CreateApplication() {
+Shadow::Application* Shadow::CreateApplication() {
 	return new Sandbox();
 }

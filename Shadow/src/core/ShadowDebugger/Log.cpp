@@ -1,5 +1,8 @@
 #include "Log.h"
+#include <chrono>
+
 namespace ShadowEngine {
+
 	namespace Debug {
 		
 		HANDLE Logger::hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -28,8 +31,7 @@ namespace ShadowEngine {
 		}
 		
 		void Logger::Log(const char* message, LogColor fg_color, LogColor bg_color, WORD format)
-		{
-			
+		{	
 			time_t cur_time = time(0);
 			tm ts;
 			localtime_s(&ts, &cur_time);
@@ -40,18 +42,16 @@ namespace ShadowEngine {
 			int hr =  ts.tm_hour;
 			int min = ts.tm_min;
 			int sec = ts.tm_sec;
-
-			std::stringstream time_stamp;
-			ResetColors();
-			time_stamp << "[" << day << "/" << mo << "/" << yr << " " << hr << ":" << min << ":" << sec << "]";
 			
+			ResetColors();
+			std::stringstream time_stamp;
+			time_stamp << "[" << day << "/" << mo << "/" << yr << " " << hr << ":" << min << ":" << sec << "]";
 			std::cout << time_stamp.str() << std::endl;
 			
 
 			ForegroundColor(fg_color);
 			BackgroundColor(bg_color);
 
-			
 			std::cout << message << std::endl;
 			
 			ResetColors();

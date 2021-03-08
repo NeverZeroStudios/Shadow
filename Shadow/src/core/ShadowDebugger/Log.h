@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "../Core.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -10,15 +10,9 @@
 
 #include <ctime>
 
-#define SHADOW_DEBUGGER ShadowEngine::Debug
 
 namespace ShadowEngine{
 	namespace Debug {
-
-		#define NONE	0b0000'0000				
-		#define RIGHT	0b0000'0001				
-		#define LEFT	0b0000'0010				
-		#define CENTER  0b0000'0011				
 
 		enum LogColor
 		{
@@ -43,7 +37,7 @@ namespace ShadowEngine{
 		class SHADOW_API Logger {
 
 		public:
-			static void Log(const char* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, WORD format = LEFT);
+			static void Log(const char* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, WORD format=0);
 
 		private:
 			static WORD BackgroundColor();
@@ -62,17 +56,17 @@ namespace ShadowEngine{
 
 // PRE-FORMATTED LOG STATEMENTS
 // --------------------------------
-#ifdef SE_BUILD_DLL
-#define _INFO(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::White)	
-#define _LOG(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Green) 
-#define _TRACE(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Yellow)
-#define _ERROR(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::DarkRed)
-#define _FATAL(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Red)
+#ifdef SHADOW_BUILD_DLL
+#define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White)	
+#define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green) 
+#define SH_DEBUGGER_TRACE(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Yellow)
+#define SH_DEBUGGER_ERR(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::DarkRed)
+#define SH_DEBUGGER_FATAL(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Red)
 #else
-#define _INFO(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::White)	
-#define _LOG(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Green) 
-#define _TRACE(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Yellow)
-#define _ERROR(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::DarkRed)
-#define _FATAL(msg)	Logger::Log(msg, SHADOW_DEBUGGER::LogColor::Red)	
+#define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White)	
+#define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green) 
+#define SH_DEBUGGER_TRACE(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Yellow)
+#define SH_DEBUGGER_ERR(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::DarkRed)
+#define SH_DEBUGGER_FATAL(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Red)	
 #endif
 }

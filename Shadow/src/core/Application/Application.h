@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.h"
-#include "Log.h"
+#include "../Core.h"
+#include "../ShadowDebugger/Log.h"
 
 namespace ShadowEngine {
 

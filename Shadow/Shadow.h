@@ -1,7 +1,13 @@
 #pragma once
 
 // for use in Shadow Engine Applications
-#include "Log.h"
-#include "Application.h"
+#include "src/core/shadowDebugger/Log.h"
+#include "src/core/Application/Application.h"
+
 // entry point
-#include "EntryPoint.h"
+#include "src/core/Application/EntryPoint.h"
+
+// namespace redeclerations
+// for use in client
+namespace Shadow			= ShadowEngine;
+namespace ShadowDebugger	= ShadowEngine::Debug;
