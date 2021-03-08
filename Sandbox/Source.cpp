@@ -2,7 +2,9 @@
 
 class Sandbox : public ShadowEngine::Application {
 public:
-	Sandbox() {}
+	Sandbox() {
+		SHADOW_DEBUGGER::_INFO("Welcome to Shadow Engine");
+	}
 	~Sandbox() {}
 
 };

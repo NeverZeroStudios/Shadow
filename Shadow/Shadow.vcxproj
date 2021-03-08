@@ -14,10 +14,12 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="EntryPoint.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="Shadow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Log.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -73,6 +75,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -89,6 +94,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
