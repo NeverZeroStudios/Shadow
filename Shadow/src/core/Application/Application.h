@@ -2,6 +2,9 @@
 
 #include "../Core.h"
 #include "../ShadowDebugger/Log.h"
+#include "../Graphics/Graphics.h"
+
+#include <wrl/client.h>
 
 namespace ShadowEngine {
 
@@ -11,8 +14,13 @@ namespace ShadowEngine {
 		Application();
 		virtual ~Application();
 
-		void Run();
 
+
+
+		int Run();
+	private:
+		Window _window;
+		Graphics _gfx;
 	};
 
 	Application* CreateApplication();

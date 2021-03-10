@@ -14,12 +14,18 @@
     <ClInclude Include="src\core\Application\Application.h" />
     <ClInclude Include="src\core\Core.h" />
     <ClInclude Include="src\core\Application\EntryPoint.h" />
+    <ClInclude Include="src\core\Graphics\Graphics.h" />
     <ClInclude Include="src\core\ShadowDebugger\Log.h" />
     <ClInclude Include="Shadow.h" />
+    <ClInclude Include="src\core\Windows\BaseWindow.h" />
+    <ClInclude Include="src\core\Windows\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Application\Application.cpp" />
+    <ClCompile Include="src\core\Graphics\Graphics.cpp" />
     <ClCompile Include="src\core\ShadowDebugger\Log.cpp" />
+    <ClCompile Include="src\core\Windows\BaseWindow.cpp" />
+    <ClCompile Include="src\core\Windows\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

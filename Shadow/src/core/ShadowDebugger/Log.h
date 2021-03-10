@@ -57,11 +57,11 @@ namespace ShadowEngine{
 // PRE-FORMATTED LOG STATEMENTS
 // --------------------------------
 #ifdef SHADOW_BUILD_DLL
-#define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White)	
-#define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green) 
-#define SH_DEBUGGER_TRACE(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Yellow)
-#define SH_DEBUGGER_ERR(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::DarkRed)
-#define SH_DEBUGGER_FATAL(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Red)
+#define SH_DEBUGGER_INFO(msg)		Debug::Logger::Log(msg, Debug::LogColor::White)	
+#define SH_DEBUGGER_LOG(msg)		Debug::Logger::Log(msg, Debug::LogColor::Green) 
+#define SH_DEBUGGER_TRACE(msg)		Debug::Logger::Log(msg, Debug::LogColor::Yellow)
+#define SH_DEBUGGER_ERR(msg)		Debug::Logger::Log(msg, Debug::LogColor::DarkRed)
+#define SH_DEBUGGER_FATAL(msg)		Debug::Logger::Log(msg, Debug::LogColor::Red)
 #else
 #define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White)	
 #define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green) 
