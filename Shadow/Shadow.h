@@ -7,6 +7,7 @@
 // entry point
 #include "src/core/Application/EntryPoint.h"
 
+
 // namespace redeclerations
 // for use in client
 namespace Shadow			= ShadowEngine;
