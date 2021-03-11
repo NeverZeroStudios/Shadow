@@ -37,7 +37,8 @@ namespace ShadowEngine{
 		class SHADOW_API Logger {
 
 		public:
-			static void Log(const char* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, WORD format=0);
+			static void Log(const char* msg, LogColor fg_color, LogColor bg_color = LogColor::Black, WORD format = 0);
+			static void Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, WORD format=0);
 
 		private:
 			static WORD BackgroundColor();

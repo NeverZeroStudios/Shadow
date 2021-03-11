@@ -55,6 +55,24 @@ namespace ShadowEngine {
         }
     }
 
+    std::optional<int> Window::ProcessMessages()
+    {
+        MSG msg;
+        ZeroMemory(&msg, sizeof(MSG));
+
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+                return msg.wParam;
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+           
+        }
+
+        return {};
+    }
+
     RECT Window::GetWindowSize()
     {
         return windowRect;
