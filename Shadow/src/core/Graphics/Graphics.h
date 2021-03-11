@@ -40,6 +40,7 @@ namespace ShadowEngine {
 		ID3D11DeviceContext* GetDeviceContext();
 		ID3D11RenderTargetView* GetRenderTargetView();
 		
+		ID3D11Buffer* GetIndexBuffer();
 		ID3D11Buffer* GetVertexBuffer();
 
 	private: // private functions
@@ -55,9 +56,10 @@ namespace ShadowEngine {
 		ID3D11RenderTargetView* pRenderTargetView;
 	
 		ID3D11Buffer* pVertexBuffer;
-		
-		ID3DBlob* vertexShaderByteCode;
-		ID3DBlob* pixelShaderByteCode;
+		ID3D11Buffer* pIndexBuffer;
+
+		ID3DBlob* pBlob;
+		//ID3DBlob* pixelShaderByteCode;
 
 		ID3D11VertexShader* pVertexShader;
 		ID3D11PixelShader* pPixelShader;

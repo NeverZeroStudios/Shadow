@@ -16,6 +16,7 @@ namespace ShadowEngine {
 		std::stringstream ss;
 		ss << "mWidth: " << monitorWidth << "\tmHeight: " << monitorHeight<< std::endl;
 		SH_DEBUGGER_INFO(ss.str().c_str());
+
 		if (!_window.Create(L"Shadow Engine Demo", WS_OVERLAPPEDWINDOW , 0, pos_x, pos_y, width, height))
 		{
 			std::stringstream ss;
@@ -66,5 +67,6 @@ namespace ShadowEngine {
 		_gfx.Draw();
 		// GFX END FRAME
 		_gfx.EndFrame();
+
 	}
 }
