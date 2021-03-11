@@ -57,6 +57,33 @@ namespace ShadowEngine {
 			ResetColors();
 		}
 
+		void Logger::Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color, WORD format)
+		{
+			time_t cur_time = time(0);
+			tm ts;
+			localtime_s(&ts, &cur_time);
+
+			int yr = ts.tm_year + 1900;
+			int mo = ts.tm_mon + 1;
+			int day = ts.tm_mday;
+			int hr = ts.tm_hour;
+			int min = ts.tm_min;
+			int sec = ts.tm_sec;
+
+			ResetColors();
+			std::stringstream time_stamp;
+			time_stamp << "[" << day << "/" << mo << "/" << yr << " " << hr << ":" << min << ":" << sec << "]";
+			std::cout << time_stamp.str() << std::endl;
+
+
+			ForegroundColor(fg_color);
+			BackgroundColor(bg_color);
+
+			std::wcout << msg << std::endl;
+
+			ResetColors();
+		}
+
 		#pragma region COLOR MANAGEMENT
 
 		WORD Logger::BackgroundColor()

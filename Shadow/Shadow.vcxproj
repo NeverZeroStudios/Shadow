@@ -27,6 +27,20 @@
     <ClCompile Include="src\core\Windows\BaseWindow.cpp" />
     <ClCompile Include="src\core\Windows\Window.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\core\Graphics\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\core\Graphics\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -76,13 +90,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SHADOW_PLATFORM_WINDOWS;SHADOW_BUILD_DLL;SE_BUILD_DLLSE_BUILD_DLL_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y
+XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\**.cso" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -93,6 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SHADOW_PLATFORM_WINDOWS;SHADOW_BUILD_DLL;SE_BUILD_DLLSE_BUILD_DLLNDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -101,7 +118,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y
+XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\**.cso" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

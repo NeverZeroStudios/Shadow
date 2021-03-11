@@ -18,6 +18,8 @@ namespace ShadowEngine {
 
 
 		int Run();
+		void ComposeFrame();
+
 	private:
 		Window _window;
 		Graphics _gfx;
