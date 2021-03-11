@@ -6,11 +6,18 @@ namespace ShadowEngine {
 	// position --> 12 bytes
 	struct Vertex    //Overloaded Vertex Structure
 	{
-		Vertex() {}
-		Vertex(float x, float y, float z)
-			: position(x, y, z) {}
-
-		DirectX::XMFLOAT3 position;
+		struct { // float3 4 bytes * 3 = 12 bytes
+			float x;
+			float y;
+			float z;
+		}position;
+		//float pad;// 4bytes + 12bytes = 16 ] // END BLOCK
+		struct { // float3 4 bytes * 4 = 16 bytes
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+			unsigned char a;
+		}color; //] END BLOCK
 	};
 
 	int color_RED[4]{ 256, 0, 0, 255 };
@@ -67,7 +74,7 @@ namespace ShadowEngine {
 		bufferDesc.Height = pWindow->GetClientSize().top + pWindow->GetClientSize().bottom;
 		bufferDesc.RefreshRate.Numerator = 60;
 		bufferDesc.RefreshRate.Denominator = 1;
-		bufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		bufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		bufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		bufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
@@ -79,7 +86,7 @@ namespace ShadowEngine {
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = 2;
+		swapChainDesc.BufferCount = 1;
 		swapChainDesc.Windowed = TRUE;
 		swapChainDesc.OutputWindow = pWindow->GetWindow();
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -91,7 +98,7 @@ namespace ShadowEngine {
 			NULL,
 			NULL,
 			NULL,
-			NULL,
+			0,
 			D3D11_SDK_VERSION,
 			&swapChainDesc,
 			&pSwapChain,
@@ -107,8 +114,8 @@ namespace ShadowEngine {
 		}
 
 		// Create Back Buffer
-		ID3D11Texture2D* backBuffer;
-		hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
+		ID3D11Resource* backBuffer;
+		hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&backBuffer);
 		if (FAILED(hr)) {
 			SH_DEBUGGER_FATAL("Back Buffer Creation Failed");
 			return false;
@@ -129,7 +136,7 @@ namespace ShadowEngine {
 
 	void Graphics::ClearBuffer(float r, float g, float b)
 	{
-		float clear_color[] = { r, g, b, 1.0f };
+		float clear_color[] = { r , g , b , 1.0f };
 		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clear_color);
 	}
 
@@ -143,10 +150,12 @@ namespace ShadowEngine {
 		// Create Buffers
 
 		// Set Data
+
 		const Vertex vertices[]{
-			{ 0.0f,  0.5f, 0.5f},
-			{ 0.5f, -0.5f, 0.5f},
-			{-0.5f, -0.5f, 0.5f},
+			// x      y      z        r   g    b     a 
+			{ 0.0f,  0.5f, 0.5f,	255, 0, 0, 255},
+			{ 0.5f, -0.5f, 0.5f,	0, 255, 0, 255},
+			{-0.5f, -0.5f, 0.5f,	0, 0, 255, 255},
 		};
 
 		// Create Buffer Description
@@ -182,11 +191,39 @@ namespace ShadowEngine {
 		UINT offset = 0;
 		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 
+
+
+		// INDEX BUFFER
+
+		const unsigned short indices[]{
+			0, 1, 2
+		};
+		D3D11_BUFFER_DESC indexBuffer_desc = {0};
+		
+
+		indexBuffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		indexBuffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		indexBuffer_desc.ByteWidth = sizeof(indices);
+		indexBuffer_desc.StructureByteStride = sizeof(unsigned short);
+
+		indexBuffer_desc.CPUAccessFlags = 0;
+		indexBuffer_desc.MiscFlags = 0;
+
+
+		// Create SubresourceData
+		D3D11_SUBRESOURCE_DATA iBuff_resoruceData = {0};
+		iBuff_resoruceData.pSysMem = indices; // set the vertices to the subResourceData
+
+		hr = pDevice->CreateBuffer(&indexBuffer_desc, &iBuff_resoruceData, &pIndexBuffer);
+
+
+		pDeviceContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
 		// Get Shaders
 
 		//////////////***************** PIXEL SHADER *****************/////////////////////
 
-		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/PixelShader.cso", &pixelShaderByteCode);
+		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/PixelShader.cso", &pBlob);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -196,7 +233,7 @@ namespace ShadowEngine {
 			//return false;
 		}
 
-		hr = pDevice->CreatePixelShader(pixelShaderByteCode->GetBufferPointer(), pixelShaderByteCode->GetBufferSize(), NULL, &pPixelShader);
+		hr = pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pPixelShader);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -213,7 +250,7 @@ namespace ShadowEngine {
 
 		//////////////***************** VERTEX SHADER *****************/////////////////////
 
-		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/VertexShader.cso", &vertexShaderByteCode);
+		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/VertexShader.cso", &pBlob);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -224,7 +261,7 @@ namespace ShadowEngine {
 			//return false;
 		}
 
-		hr = pDevice->CreateVertexShader(vertexShaderByteCode->GetBufferPointer(), vertexShaderByteCode->GetBufferSize(), NULL, &pVertexShader);
+		hr = pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pVertexShader);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -239,13 +276,14 @@ namespace ShadowEngine {
 
 		//////////////***************** END VERTEX SHADER *****************/////////////////////
 		const D3D11_INPUT_ELEMENT_DESC inputLayout[]{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 		int numElements = ARRAYSIZE(inputLayout);
 
 
-		hr = pDevice->CreateInputLayout(inputLayout, numElements, vertexShaderByteCode->GetBufferPointer(), vertexShaderByteCode->GetBufferSize(), &pInputLayout);
+		hr = pDevice->CreateInputLayout(inputLayout, numElements, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
 
 		if (FAILED(hr)) {
 			std::wstringstream ss;
@@ -280,7 +318,8 @@ namespace ShadowEngine {
 
 		//////////////***************** END RASTERIZE STAGE *****************/////////////////////
 		SH_DEBUGGER_INFO("End of Render Test");
-		pDeviceContext->Draw(3, 0);
+
+		pDeviceContext->DrawIndexed((UINT)std::size(indices), 0, 0);
 
 	}
 
@@ -300,33 +339,10 @@ namespace ShadowEngine {
 		return newColor;
 	}
 
-	int* AddColors(int* color_a, int* color_b) {
-		int newColor[4] = { 0 };
-
-
-		int n_r = color_a[0] + color_b[0];
-		if (n_r > 255) n_r = 255;
-
-		int n_g = color_a[1] + color_b[1];
-		if (n_g > 255) n_g = 255;
-
-		int n_b = color_a[2] + color_b[2];
-		if (n_b > 255) n_b = 255;
-
-		int n_a = color_a[3] + color_b[3];
-		if (n_a > 255) n_a = 255;
-
-		newColor[0] = n_r;
-		newColor[1] = n_g;
-		newColor[2] = n_b;
-		newColor[3] = n_a;
-
-		return newColor;
-	}
-
 	void Graphics::EndFrame()
 	{
-		if (FAILED(pSwapChain->Present(1u, 0))) {
+		HRESULT hr;
+		if (FAILED(hr = pSwapChain->Present(1u, 0))) {
 			SH_DEBUGGER_FATAL("FAILED TO FLIP BUFFERS");
 		}
 		SH_DEBUGGER_INFO("RENDER FINISHED");
@@ -344,8 +360,8 @@ namespace ShadowEngine {
 		pVertexShader->Release();
 		pPixelShader->Release();
 
-		vertexShaderByteCode->Release();
-		pixelShaderByteCode->Release();
+		pBlob->Release();
+		//pixelShaderByteCode->Release();
 
 		pInputLayout->Release();
 
@@ -369,6 +385,11 @@ namespace ShadowEngine {
 	ID3D11RenderTargetView* Graphics::GetRenderTargetView()
 	{
 		return pRenderTargetView;
+	}
+
+	ID3D11Buffer* Graphics::GetIndexBuffer()
+	{
+		return pIndexBuffer;
 	}
 
 	ID3D11Buffer* Graphics::GetVertexBuffer()
