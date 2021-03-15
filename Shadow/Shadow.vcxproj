@@ -11,6 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\Events\MouseEvents.h" />
+    <ClInclude Include="src\core\Events\Event.h" />
+    <ClInclude Include="src\core\Events\KeyEvents.h" />
+    <ClInclude Include="src\data_structures\Queue.h" />
+    <ClInclude Include="src\core\Input\Keyboard.h" />
     <ClInclude Include="src\core\Application\Application.h" />
     <ClInclude Include="src\core\Core.h" />
     <ClInclude Include="src\core\Application\EntryPoint.h" />
@@ -21,6 +26,11 @@
     <ClInclude Include="src\core\Windows\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\Events\MouseEvents.cpp" />
+    <ClCompile Include="src\core\Events\Event.cpp" />
+    <ClCompile Include="src\core\Events\KeyEvents.cpp" />
+    <ClCompile Include="src\data_structures\Queue.cpp" />
+    <ClCompile Include="src\core\Input\Keyboard.cpp" />
     <ClCompile Include="src\core\Application\Application.cpp" />
     <ClCompile Include="src\core\Graphics\Graphics.cpp" />
     <ClCompile Include="src\core\ShadowDebugger\Log.cpp" />
@@ -78,11 +88,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -91,6 +103,8 @@
       <PreprocessorDefinitions>SHADOW_PLATFORM_WINDOWS;SHADOW_BUILD_DLL;SE_BUILD_DLLSE_BUILD_DLL_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,6 +124,8 @@ XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\**.cso" "$(Solution
       <PreprocessorDefinitions>SHADOW_PLATFORM_WINDOWS;SHADOW_BUILD_DLL;SE_BUILD_DLLSE_BUILD_DLLNDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

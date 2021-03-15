@@ -1,15 +1,18 @@
 #pragma once
+
+#include "../core.h"
+#include "../Windows/Window.h"
+#include "../ShadowDebugger/Log.h"
+
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include <d3d11.h>
-
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
+
 #include <wrl/client.h>
 #include <comdef.h>
-#include "../Windows/Window.h"
-#include "../ShadowDebugger/Log.h"
 
 namespace ShadowEngine {
 	class SHADOW_API Graphics {

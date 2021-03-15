@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "../ShadowDebugger/Log.h"
 #include <comdef.h>
 namespace ShadowEngine {
 
@@ -29,6 +28,12 @@ namespace ShadowEngine {
 		ShowWindow(_window.GetWindow(), SW_SHOW);
 		UpdateWindow(_window.GetWindow());
 
+		// Init Input
+		if (!_window.InitEventsQueue(_events)) {
+			SH_DEBUGGER_ERR("Could Not Initilize Event Queue..");
+			
+		}
+
 		if (!_gfx.Init(_window)){
 			
 			std::stringstream ss;
@@ -52,10 +57,21 @@ namespace ShadowEngine {
 	int Application::Run()
 	{
 		while (true) {
+			// Process Messages
 			if (const auto eCode = _window.ProcessMessages()) {
 				return *eCode;
 			}
+			// Process Events
+			while (!_events.Empty()) {
+				Events::Event* ev = _events.Peek()->data;
+				SH_DEBUGGER_INFO(ev->ToString().c_str());
+				// set the event to be handled 
+				ev->Handled(true);
+				_events.Dequeue();
+			}
+			// Draw Graphics
 			ComposeFrame();
+
 		}
 	}
 
