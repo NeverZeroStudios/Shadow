@@ -9,6 +9,7 @@ public:
 	~Sandbox() {
 		SH_DEBUGGER_INFO("Closing Shadow Engine");
 	}
+
 };
 
 Shadow::Application* Shadow::CreateApplication() {

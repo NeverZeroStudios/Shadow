@@ -1,10 +1,15 @@
 #pragma once
 
 #include "../Core.h"
+
+#include "../Windows/Window.h"
 #include "../ShadowDebugger/Log.h"
 #include "../Graphics/Graphics.h"
+#include "../Input/Keyboard.h"
 
-#include <wrl/client.h>
+// Event handling
+#include "../../data_structures/Queue.h"
+#include "../Events/Event.h"
 
 namespace ShadowEngine {
 
@@ -14,15 +19,16 @@ namespace ShadowEngine {
 		Application();
 		virtual ~Application();
 
-
-
-
-		int Run();
+		virtual int Run();
 		void ComposeFrame();
 
-	private:
+	protected:
 		Window _window;
 		Graphics _gfx;
+		Keyboard _keyboard;
+		
+		DataStructures::Queue<Events::Event*> _events;
+
 	};
 
 	Application* CreateApplication();

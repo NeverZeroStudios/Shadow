@@ -1,6 +1,14 @@
+#pragma once
+
 #include "../Core.h"
+
 #include "BaseWindow.h"
 #include <optional>
+
+#include "../../data_structures/Queue.h"
+#include "../Events/Event.h"
+#include "../Events/KeyEvents.h"
+#include "../Events/MouseEvents.h"
 
 namespace ShadowEngine {
 
@@ -12,11 +20,15 @@ namespace ShadowEngine {
 		
 		static std::optional<int> ProcessMessages();
 
+		bool InitEventsQueue(DataStructures::Queue<Events::Event*>& queue);
+
 		RECT GetWindowSize();
 		RECT GetClientSize();
 
 	private:
 		RECT windowRect = {0};
 		RECT clientRect = {0};
+
+		DataStructures::Queue<Events::Event*>* events;
 	};
 }

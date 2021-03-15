@@ -317,7 +317,7 @@ namespace ShadowEngine {
 		pDeviceContext->RSSetViewports(1, &viewport);
 
 		//////////////***************** END RASTERIZE STAGE *****************/////////////////////
-		SH_DEBUGGER_INFO("End of Render Test");
+		//SH_DEBUGGER_INFO("End of Render Test");
 
 		pDeviceContext->DrawIndexed((UINT)std::size(indices), 0, 0);
 
@@ -345,7 +345,7 @@ namespace ShadowEngine {
 		if (FAILED(hr = pSwapChain->Present(1u, 0))) {
 			SH_DEBUGGER_FATAL("FAILED TO FLIP BUFFERS");
 		}
-		SH_DEBUGGER_INFO("RENDER FINISHED");
+		//SH_DEBUGGER_INFO("RENDER FINISHED");
 
 	}
 

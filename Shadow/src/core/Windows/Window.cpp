@@ -1,5 +1,8 @@
 #include "Window.h"
-#include "../ShadowDebugger/Log.h"
+#include "windowsx.h"
+
+#define BIT(bit)(1<<bit)
+#define AT_BIT(bit) & BIT(bit)
 
 namespace ShadowEngine {
 
@@ -44,11 +47,43 @@ namespace ShadowEngine {
 
     LRESULT Window::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
+        static int rp_count = 0;
         switch (uMsg) {
             case WM_DESTROY:
-                SH_DEBUGGER_INFO("GOOD BYE!");
                 PostQuitMessage(0);
                 break;
+#pragma region MOUSE INPUT MESSAGES
+
+            case WM_MOUSEMOVE:
+                events->Enqueue(new Events::MouseMovedEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                break;
+
+            case WM_LBUTTONDOWN:
+                events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::LEFT));
+                break;
+
+            case WM_MBUTTONDOWN:
+                events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::MIDDLE));
+                break;
+
+            case WM_RBUTTONDOWN:
+                events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::RIGHT));
+                break;
+
+#pragma endregion
+#pragma region KEYBOARD INPUT MESSAGES
+            case WM_KEYDOWN:
+                if (lParam AT_BIT(30)) // trying to repeat
+                    rp_count++;
+
+                events->Enqueue(new Events::KeyPressedEvent(wParam, rp_count));
+                break;
+            case WM_KEYUP: 
+                rp_count = 0;
+                events->Enqueue(new Events::KeyReleasedEvent(wParam));
+                break;
+#pragma endregion
+
             default:
                 return DefWindowProc(_hWnd, uMsg, wParam, lParam);
                 break;
@@ -60,6 +95,8 @@ namespace ShadowEngine {
         MSG msg;
         ZeroMemory(&msg, sizeof(MSG));
 
+        // while the message queue has something in it
+        // process messages.. but do NOT block on empty queue
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
@@ -67,10 +104,15 @@ namespace ShadowEngine {
 
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-           
         }
 
         return {};
+    }
+
+    bool Window::InitEventsQueue(DataStructures::Queue<Events::Event*>& queue)
+    {
+        events = &queue;
+        return events == nullptr ? false : true;
     }
 
     RECT Window::GetWindowSize()

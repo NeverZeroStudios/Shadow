@@ -1,5 +1,7 @@
 #pragma once
-#include "../ShadowDebugger/Log.h"
+
+
+#include "Application.h"
 
 #ifdef SHADOW_PLATFORM_WINDOWS
 
