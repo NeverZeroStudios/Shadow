@@ -144,6 +144,20 @@ namespace ShadowEngine {
 	{
 		DrawTest();
 	}
+
+	std::wstring GetExeFileName()
+	{
+		wchar_t buffer[MAX_PATH];
+		GetModuleFileName(NULL, buffer, MAX_PATH);
+		return std::wstring(buffer);
+	}
+
+	std::wstring GetExePath()
+	{
+		std::wstring f = GetExeFileName();
+		return f.substr(0, f.find_last_of(L"\\/"));
+	}
+
 	void Graphics::DrawTest()
 	{
 		//////////////***************** INPUT ASSEMBLER *****************/////////////////////
@@ -222,8 +236,10 @@ namespace ShadowEngine {
 		// Get Shaders
 
 		//////////////***************** PIXEL SHADER *****************/////////////////////
-
-		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/PixelShader.cso", &pBlob);
+	
+		std::wstringstream pixel_path;
+		pixel_path << GetExePath() << L"\\PixelShader.cso";
+		hr = D3DReadFileToBlob(pixel_path.str().c_str(), &pBlob);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -249,8 +265,9 @@ namespace ShadowEngine {
 
 
 		//////////////***************** VERTEX SHADER *****************/////////////////////
-
-		hr = D3DReadFileToBlob(L"../bin/Debug-x64/Shadow/VertexShader.cso", &pBlob);
+		std::wstringstream vert_path;
+		vert_path << GetExePath() << L"\\VertexShader.cso";
+		hr = D3DReadFileToBlob(vert_path.str().c_str(), &pBlob);
 
 		if (FAILED(hr)) {
 			_com_error error(hr);
@@ -272,8 +289,8 @@ namespace ShadowEngine {
 		}
 
 		pDeviceContext->VSSetShader(pVertexShader, nullptr, 0);
-
-
+		vert_path.clear();
+		
 		//////////////***************** END VERTEX SHADER *****************/////////////////////
 		const D3D11_INPUT_ELEMENT_DESC inputLayout[]{
 			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
