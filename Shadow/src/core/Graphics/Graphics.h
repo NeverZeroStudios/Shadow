@@ -19,21 +19,13 @@ namespace ShadowEngine {
 	public:
 		bool Init(Window& window);
 		bool InitDirectX();
-		//bool InitScene();
-		
-		/*void Update();
-		void Render();*/
-		//	Clear Buffer()
-		
+
 		void ClearBuffer(float r, float g, float b);
 
-		//	Draw Frame()
-			// Draw Test Triangle
 		void Draw();
 
 		void DrawTest();
 
-		//	End Frame()
 		void EndFrame();
 
 		void Cleanup();

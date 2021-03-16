@@ -129,6 +129,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y
+XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\**.cso" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -147,6 +151,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\Shadow.dll" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y
+XCOPY "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Shadow\**.cso" "$(SolutionDIr)bin\$(Configuration)-$(Platform)\Sandbox\" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shadow\Shadow.vcxproj">

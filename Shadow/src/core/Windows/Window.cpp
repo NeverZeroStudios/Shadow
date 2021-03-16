@@ -52,22 +52,43 @@ namespace ShadowEngine {
             case WM_DESTROY:
                 PostQuitMessage(0);
                 break;
+
 #pragma region MOUSE INPUT MESSAGES
 
             case WM_MOUSEMOVE:
                 events->Enqueue(new Events::MouseMovedEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                mouse->Position({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
                 break;
 
             case WM_LBUTTONDOWN:
                 events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::LEFT));
+                mouse->buttons[0] = true;
                 break;
 
             case WM_MBUTTONDOWN:
                 events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::MIDDLE));
+                mouse->buttons[1] = true;
                 break;
 
             case WM_RBUTTONDOWN:
                 events->Enqueue(new Events::MouseClickEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::RIGHT));
+                mouse->buttons[2] = true;
+                break;
+
+
+            case WM_LBUTTONUP:
+                events->Enqueue(new Events::MouseReleasedEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::LEFT));
+                mouse->buttons[0] = false;
+                break;
+
+            case WM_MBUTTONUP:
+                events->Enqueue(new Events::MouseReleasedEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::MIDDLE));
+                mouse->buttons[1] = false;
+                break;
+
+            case WM_RBUTTONUP:
+                events->Enqueue(new Events::MouseReleasedEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), Events::MOUSE_BUTTON::RIGHT));
+                mouse->buttons[2] = false;
                 break;
 
 #pragma endregion
@@ -75,12 +96,13 @@ namespace ShadowEngine {
             case WM_KEYDOWN:
                 if (lParam AT_BIT(30)) // trying to repeat
                     rp_count++;
-
                 events->Enqueue(new Events::KeyPressedEvent(wParam, rp_count));
+                keyboard->keystates[wParam] = true;
                 break;
             case WM_KEYUP: 
                 rp_count = 0;
                 events->Enqueue(new Events::KeyReleasedEvent(wParam));
+                keyboard->keystates[wParam] = false;
                 break;
 #pragma endregion
 
@@ -113,6 +135,15 @@ namespace ShadowEngine {
     {
         events = &queue;
         return events == nullptr ? false : true;
+    }
+    bool Window::InitKeyboard(Input::Keyboard& kb)
+    {
+        keyboard = &kb;
+        return keyboard == nullptr ? false : true;
+    }
+    bool Window::InitMouse(Input::Mouse& mo) {
+        mouse = &mo;
+        return mouse == nullptr ? false : true;
     }
 
     RECT Window::GetWindowSize()

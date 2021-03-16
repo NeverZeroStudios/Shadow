@@ -1,13 +1,11 @@
 #pragma once
+#include "../Input/Mouse.h"
 #include "Event.h"
 
 namespace ShadowEngine {
 	namespace Events {
 		
-		struct MousePoint {
-			int x;
-			int y;
-		};
+	
 		enum MOUSE_BUTTON {
 			LEFT, 
 			MIDDLE,
@@ -20,15 +18,26 @@ namespace ShadowEngine {
 			// Inherited via Event
 			virtual const char* GetClassificationToString() override;
 
-			virtual MousePoint GetPosition(); 
+			virtual Input::MousePoint GetPosition(); 
 		private:
-			MousePoint position;
+			Input::MousePoint position;
 
 		};
 
 		class MouseClickEvent : public MouseEvent {
 		public:
 			MouseClickEvent(int x, int y, MOUSE_BUTTON btn) : MouseEvent(x, y), pressed(btn) {}
+
+			virtual std::string ToString() override;
+			virtual const char* GetTypeToString() override;
+		private:
+			MOUSE_BUTTON pressed;
+
+		};
+
+		class MouseReleasedEvent : public MouseEvent {
+		public:
+			MouseReleasedEvent(int x, int y, MOUSE_BUTTON btn) : MouseEvent(x, y), pressed(btn) {}
 
 			virtual std::string ToString() override;
 			virtual const char* GetTypeToString() override;

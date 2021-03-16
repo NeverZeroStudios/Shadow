@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\Input\Mouse.h" />
     <ClInclude Include="src\core\Events\MouseEvents.h" />
     <ClInclude Include="src\core\Events\Event.h" />
     <ClInclude Include="src\core\Events\KeyEvents.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="src\core\Windows\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\Input\Mouse.cpp" />
     <ClCompile Include="src\core\Events\MouseEvents.cpp" />
     <ClCompile Include="src\core\Events\Event.cpp" />
     <ClCompile Include="src\core\Events\KeyEvents.cpp" />

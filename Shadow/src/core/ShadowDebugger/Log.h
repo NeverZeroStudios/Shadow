@@ -37,8 +37,8 @@ namespace ShadowEngine{
 		class SHADOW_API Logger {
 
 		public:
-			static void Log(const char* msg, LogColor fg_color, LogColor bg_color = LogColor::Black, WORD format = 0);
-			static void Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, WORD format=0);
+			static void Log(const char* msg, LogColor fg_color, LogColor bg_color = LogColor::Black,  const char* sender = "ENGINE");
+			static void Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color=LogColor::Black, const wchar_t* sender = L"ENGINE");
 
 		private:
 			static WORD BackgroundColor();
@@ -64,10 +64,10 @@ namespace ShadowEngine{
 #define SH_DEBUGGER_ERR(msg)		Debug::Logger::Log(msg, Debug::LogColor::DarkRed)
 #define SH_DEBUGGER_FATAL(msg)		Debug::Logger::Log(msg, Debug::LogColor::Red)
 #else
-#define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White)	
-#define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green) 
-#define SH_DEBUGGER_TRACE(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Yellow)
-#define SH_DEBUGGER_ERR(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::DarkRed)
-#define SH_DEBUGGER_FATAL(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Red)	
+#define SH_DEBUGGER_INFO(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::White, ShadowDebugger::LogColor::Black, "CLIENT")	
+#define SH_DEBUGGER_LOG(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Green, ShadowDebugger::LogColor::Black, "CLIENT") 
+#define SH_DEBUGGER_TRACE(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Yellow, ShadowDebugger::LogColor::Black, "CLIENT")
+#define SH_DEBUGGER_ERR(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::DarkRed, ShadowDebugger::LogColor::Black, "CLIENT")
+#define SH_DEBUGGER_FATAL(msg)		ShadowDebugger::Logger::Log(msg, ShadowDebugger::LogColor::Red, ShadowDebugger::LogColor::Black, "CLIENT")	
 #endif
 }

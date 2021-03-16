@@ -3,7 +3,6 @@
 namespace ShadowEngine {
     namespace Events {
         
-
         MouseEvent::MouseEvent(int x, int y) : position({x, y})
         {
 
@@ -13,7 +12,8 @@ namespace ShadowEngine {
         {
             return "Input | Mouse";
         }
-        MousePoint MouseEvent::GetPosition()
+
+        Input::MousePoint MouseEvent::GetPosition()
         {
             return position;
         }
@@ -34,9 +34,7 @@ namespace ShadowEngine {
             return "Mouse Clicked Event";
         }
 
-
         MouseMovedEvent::MouseMovedEvent(int x, int y) : MouseEvent(x, y) {}
-        
         
         std::string MouseMovedEvent::ToString()
         {
@@ -47,9 +45,25 @@ namespace ShadowEngine {
                 "Position: x " << GetPosition().x << "\t" << "y " << GetPosition().y << std::endl;
             return __.str();
         }
+        
         const char* MouseMovedEvent::GetTypeToString()
         {
             return "Mouse Moved event";
+        }
+
+        std::string MouseReleasedEvent::ToString()
+        {
+            std::stringstream __;
+            __ << "Event Classification: " << GetClassificationToString() << std::endl <<
+                "Event Type: " << GetTypeToString() << std::endl <<
+                "Event Data: " << std::endl <<
+                "Position: x " << GetPosition().x << "\t" << "y " << GetPosition().y << std::endl;
+            return __.str();
+        }
+
+        const char* MouseReleasedEvent::GetTypeToString()
+        {
+            return "Mouse Released Event";
         }
     }
 }
