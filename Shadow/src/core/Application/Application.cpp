@@ -9,7 +9,7 @@ namespace ShadowEngine {
 		int monitorWidth = GetSystemMetrics(SM_CXSCREEN);
 		int monitorHeight = GetSystemMetrics(SM_CYSCREEN);
 
-		int pos_x = monitorWidth / 2 - width / 2; // DEBUG used for 3840x1280 resolution
+		int pos_x = monitorWidth / 2 - width / 2; 
 		int pos_y = monitorHeight / 2 - height / 2;
 
 		std::stringstream ss;
@@ -31,7 +31,13 @@ namespace ShadowEngine {
 		// Init Input
 		if (!_window.InitEventsQueue(_events)) {
 			SH_DEBUGGER_ERR("Could Not Initilize Event Queue..");
-			
+		}
+		if (!_window.InitKeyboard(this->Keyboard)) {
+			SH_DEBUGGER_ERR("Could Not Initilize Keyboard..");
+		}
+		if (!_window.InitMouse(this->Mouse)) {
+
+			SH_DEBUGGER_ERR("Could Not Initilize Keyboard..");
 		}
 
 		if (!_gfx.Init(_window)){
@@ -54,24 +60,14 @@ namespace ShadowEngine {
 		_gfx.Cleanup();
 	}
 
-	int Application::Run()
-	{
-		while (true) {
-			// Process Messages
-			if (const auto eCode = _window.ProcessMessages()) {
-				return *eCode;
-			}
-			// Process Events
-			while (!_events.Empty()) {
-				Events::Event* ev = _events.Peek()->data;
-				SH_DEBUGGER_INFO(ev->ToString().c_str());
-				// set the event to be handled 
-				ev->Handled(true);
-				_events.Dequeue();
-			}
-			// Draw Graphics
-			ComposeFrame();
-
+	
+	void Application::ProcessEvents() {
+		while (!_events.Empty()) {
+			Events::Event* ev = _events.Peek()->data;
+			SH_DEBUGGER_INFO(ev->ToString().c_str());
+			// set the event to be handled 
+			ev->Handled(true);
+			_events.Dequeue();
 		}
 	}
 

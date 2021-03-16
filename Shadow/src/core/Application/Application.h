@@ -19,13 +19,14 @@ namespace ShadowEngine {
 		Application();
 		virtual ~Application();
 
-		virtual int Run();
+		virtual int Run() = 0;
 		void ComposeFrame();
-
+		void ProcessEvents();
 	protected:
 		Window _window;
 		Graphics _gfx;
-		Keyboard _keyboard;
+		Input::Keyboard Keyboard;
+		Input::Mouse Mouse;
 		
 		DataStructures::Queue<Events::Event*> _events;
 

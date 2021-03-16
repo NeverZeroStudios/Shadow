@@ -7,7 +7,7 @@ namespace ShadowEngine {
 		
 		HANDLE Logger::hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
 		
-		void Logger::Log(const char* message, LogColor fg_color, LogColor bg_color, WORD format)
+		void Logger::Log(const char* message, LogColor fg_color, LogColor bg_color, const char* sender)
 		{	
 			time_t cur_time = time(0);
 			tm ts;
@@ -29,12 +29,12 @@ namespace ShadowEngine {
 			ForegroundColor(fg_color);
 			BackgroundColor(bg_color);
 
-			std::cout << message << std::endl;
+			std::cout << sender << ": "<< message << std::endl;
 			
 			ResetColors();
 		}
 
-		void Logger::Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color, WORD format)
+		void Logger::Log(const wchar_t* msg, LogColor fg_color, LogColor bg_color, const wchar_t* sender)
 		{
 			time_t cur_time = time(0);
 			tm ts;

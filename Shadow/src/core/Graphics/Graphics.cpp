@@ -36,7 +36,6 @@ namespace ShadowEngine {
 	bool Graphics::Init(Window& window)
 	{
 		pWindow = &window;
-
 		if (!InitDirectX()) {
 			return false;
 		}
@@ -66,6 +65,8 @@ namespace ShadowEngine {
 
 	bool Graphics::InitDirectX()
 	{
+		SH_DEBUGGER_INFO("Initilizing DirectX 11");
+
 		// Describe the Buffer
 		DXGI_MODE_DESC bufferDesc;
 		ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
@@ -251,9 +252,12 @@ namespace ShadowEngine {
 
 		hr = pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pPixelShader);
 
+
+
 		if (FAILED(hr)) {
 			_com_error error(hr);
 			std::wstringstream ss;
+
 			ss << "Could not Create Pixel Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
 			SH_DEBUGGER_FATAL(ss.str().c_str());
 			//return false;
@@ -267,6 +271,7 @@ namespace ShadowEngine {
 		//////////////***************** VERTEX SHADER *****************/////////////////////
 		std::wstringstream vert_path;
 		vert_path << GetExePath() << L"\\VertexShader.cso";
+
 		hr = D3DReadFileToBlob(vert_path.str().c_str(), &pBlob);
 
 		if (FAILED(hr)) {
@@ -275,6 +280,7 @@ namespace ShadowEngine {
 
 			ss << "Could not find Vertex Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
 			SH_DEBUGGER_FATAL(ss.str().c_str());
+
 			//return false;
 		}
 
