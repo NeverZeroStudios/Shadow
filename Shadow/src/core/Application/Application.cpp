@@ -12,10 +12,6 @@ namespace ShadowEngine {
 		int pos_x = monitorWidth / 2 - width / 2; 
 		int pos_y = monitorHeight / 2 - height / 2;
 
-		std::stringstream ss;
-		ss << "mWidth: " << monitorWidth << "\tmHeight: " << monitorHeight<< std::endl;
-		SH_DEBUGGER_INFO(ss.str().c_str());
-
 		if (!_window.Create(L"Shadow Engine Demo", WS_OVERLAPPEDWINDOW , 0, pos_x, pos_y, width, height))
 		{
 			std::stringstream ss;
@@ -50,9 +46,7 @@ namespace ShadowEngine {
 			SH_DEBUGGER_ERR(ss.str().c_str());
 		}
 
-		SH_DEBUGGER_INFO("Window Create Successfully");
-
-		
+		SH_DEBUGGER_LOG("Window Create Successfully");
 	}
 
 	Application::~Application()
@@ -60,7 +54,6 @@ namespace ShadowEngine {
 		_gfx.Cleanup();
 	}
 
-	
 	void Application::ProcessEvents() {
 		while (!_events.Empty()) {
 			Events::Event* ev = _events.Peek()->data;
@@ -74,11 +67,12 @@ namespace ShadowEngine {
 	void Application::ComposeFrame()
 	{
 		// GFX CLEAR BUFFER
-		_gfx.ClearBuffer(.16f, .14f, .12f);
+		_gfx.ClearBuffer(.0f, .0f, .0f);
 		// GFX DRAW
-		_gfx.Draw();
+		_gfx.Update(timer.Peek());
 		// GFX END FRAME
 		_gfx.EndFrame();
+		
 
 	}
 }

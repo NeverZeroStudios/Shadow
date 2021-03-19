@@ -10,6 +10,8 @@
 // Event handling
 #include "../../data_structures/Queue.h"
 #include "../Events/Event.h"
+#include "../../util/Utilities.h"
+
 
 namespace ShadowEngine {
 
@@ -27,7 +29,9 @@ namespace ShadowEngine {
 		Graphics _gfx;
 		Input::Keyboard Keyboard;
 		Input::Mouse Mouse;
-		
+		Utilities::Timer timer;
+
+
 		DataStructures::Queue<Events::Event*> _events;
 
 	};

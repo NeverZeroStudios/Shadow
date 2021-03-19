@@ -25,6 +25,7 @@
     <ClInclude Include="Shadow.h" />
     <ClInclude Include="src\core\Windows\BaseWindow.h" />
     <ClInclude Include="src\core\Windows\Window.h" />
+    <ClInclude Include="src\util\Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Input\Mouse.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="src\core\ShadowDebugger\Log.cpp" />
     <ClCompile Include="src\core\Windows\BaseWindow.cpp" />
     <ClCompile Include="src\core\Windows\Window.cpp" />
+    <ClCompile Include="src\util\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\core\Graphics\PixelShader.hlsl">

@@ -1,14 +1,20 @@
-struct VS_OUTPUT {
-	float3 color : Color;
-	float4 position : SV_Position;
+cbuffer buff
+{
+	float4x4 mat;
 };
 
-VS_OUTPUT main(float3 inPos : Position, float3 inColor : Color)
+struct VS_OUTPUT
+{
+float3 color : Color;
+float4 position : SV_Position;
+};
+
+VS_OUTPUT main(float4 inPos : Position, float3 inColor : Color)
 {
 	VS_OUTPUT vso;
 	
 	vso.color = inColor;
-	vso.position = float4(inPos, 1.0f);
+	vso.position = mul(inPos, mat);
 	
 	return vso;
 }

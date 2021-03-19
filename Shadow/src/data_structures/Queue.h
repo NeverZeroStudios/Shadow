@@ -6,19 +6,15 @@ namespace ShadowEngine {
 	namespace DataStructures {
 
 		template<typename T>
-		struct SHADOW_API Node { // ADD RULE OF 3// CHANGE TO CLASS SEE IF THAT HELPS????
-
-		public:
-			Node<T>* next;
-			T data;
-
-		};
-
-		template<typename T>
 		class SHADOW_API Queue {
 		public:
 
+			template<typename T>
+			struct Node { 
+				Node<T>* next;
+				T data;
 
+			};
 			void Enqueue(T data) {
 
 				Node<T>* temp = new Node<T>;

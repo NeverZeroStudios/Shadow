@@ -42,6 +42,9 @@ namespace ShadowEngine {
 
 		return true;
 	}
+	float degreesToRadians(float degrees) {
+		return degrees * (3.14 / 180);
+	}
 	/*
 	* DXGI_FORMAT_R8G8B8A8_UNORM
 	A four-component, 32-bit unsigned-normalized-integer format that supports 8 bits per channel including alpha.
@@ -62,30 +65,38 @@ namespace ShadowEngine {
 			would resukt in a transparent color becaue there is no alpha channel
 
 	*/
-
+	static float pos_z = 0;
 	bool Graphics::InitDirectX()
 	{
 		SH_DEBUGGER_INFO("Initilizing DirectX 11");
 
-		// Describe the Buffer
-		DXGI_MODE_DESC bufferDesc;
-		ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
+		//////////////***************** INPUT ASSEMBLER *****************/////////////////////
 
-		bufferDesc.Width = pWindow->GetClientSize().left + pWindow->GetClientSize().right;
-		bufferDesc.Height = pWindow->GetClientSize().top + pWindow->GetClientSize().bottom;
-		bufferDesc.RefreshRate.Numerator = 60;
-		bufferDesc.RefreshRate.Denominator = 1;
-		bufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		bufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		bufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		int width = pWindow->GetClientSize().left + pWindow->GetClientSize().right;
+		int height = pWindow->GetClientSize().top + pWindow->GetClientSize().bottom;
+		// Describe the Buffer
+		DXGI_MODE_DESC buffer_desc;
+		ZeroMemory(&buffer_desc, sizeof(DXGI_MODE_DESC));
+
+		buffer_desc.Width = width;
+		buffer_desc.Height = height;
+		buffer_desc.RefreshRate.Numerator = 60;
+		buffer_desc.RefreshRate.Denominator = 1;
+		buffer_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		buffer_desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		buffer_desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+
+		DXGI_SAMPLE_DESC sample_desc{0};
+		sample_desc.Count = 1;
+		sample_desc.Quality = 0;
 
 		// Describe SwapChain
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 		ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 
-		swapChainDesc.BufferDesc = bufferDesc;
-		swapChainDesc.SampleDesc.Count = 1;
-		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferDesc = buffer_desc;
+		swapChainDesc.SampleDesc = sample_desc;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = 1;
 		swapChainDesc.Windowed = TRUE;
@@ -108,70 +119,155 @@ namespace ShadowEngine {
 			&pDeviceContext
 		);
 
+
+
+
 		if (FAILED(hr)) {
 			_com_error error(hr);
-			SH_DEBUGGER_FATAL("Could not initilize Direct X 11 Device context or SwapChain");
+			std::wstringstream ss;
+			ss << "Could not initilize Direct X 11 Device context or SwapChain" << std::endl <<
+				"Error Description: " << error.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());
 			return false;
 		}
 
 		// Create Back Buffer
 		ID3D11Resource* backBuffer;
-		hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&backBuffer);
+		hr = GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&backBuffer);
 		if (FAILED(hr)) {
 			SH_DEBUGGER_FATAL("Back Buffer Creation Failed");
 			return false;
 		}
 
 
-		//////////////***************** OUTPUT MERGER *****************/////////////////////
-		// Create Render Target
-		pDevice->CreateRenderTargetView(backBuffer, NULL, &pRenderTargetView);
-		backBuffer->Release();
+		// Get Shaders
+		#pragma region Pixel Shader
+
+
+		//////////////***************** PIXEL SHADER *****************/////////////////////
+
+		std::wstringstream pixel_path;
+		pixel_path << Utilities::FileStructure::BuildFilePath(L"PixelShader.cso");
+		hr = D3DReadFileToBlob(pixel_path.str().c_str(), &pBlob);
+
+		if (FAILED(hr)) {
+			_com_error error(hr);
+			std::wstringstream ss;
+			ss << "Could not find Pixel Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());
+			return false;
+		}
+
+		hr = GetDevice()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pPixelShader);
 
 
 
-		//////////////***************** END OUTPUT MERGER *****************/////////////////////
+		if (FAILED(hr)) {
+			_com_error error(hr);
+			std::wstringstream ss;
 
-		return true;
-	}
+			ss << "Could not Create Pixel Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());
+			return false;
+		}
 
-	void Graphics::ClearBuffer(float r, float g, float b)
-	{
-		float clear_color[] = { r , g , b , 1.0f };
-		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clear_color);
-	}
+		pDeviceContext->PSSetShader(pPixelShader, nullptr, 0);
 
-	void Graphics::Draw()
-	{
-		DrawTest();
-	}
+		//////////////***************** END PIXEL SHADER *****************/////////////////////
+		#pragma endregion
 
-	std::wstring GetExeFileName()
-	{
-		wchar_t buffer[MAX_PATH];
-		GetModuleFileName(NULL, buffer, MAX_PATH);
-		return std::wstring(buffer);
-	}
+		#pragma region Vertex Shader
+		//////////////***************** VERTEX SHADER *****************/////////////////////
+		std::wstringstream vert_path;
+		vert_path << Utilities::FileStructure::BuildFilePath(L"VertexShader.cso");
 
-	std::wstring GetExePath()
-	{
-		std::wstring f = GetExeFileName();
-		return f.substr(0, f.find_last_of(L"\\/"));
-	}
+		hr = D3DReadFileToBlob(vert_path.str().c_str(), &pBlob);
 
-	void Graphics::DrawTest()
-	{
-		//////////////***************** INPUT ASSEMBLER *****************/////////////////////
-		// Create Buffers
+		if (FAILED(hr)) {
+			_com_error error(hr);
+			std::wstringstream ss;
 
-		// Set Data
+			ss << "Could not find Vertex Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());
+
+			return false;
+		}
+
+		hr = GetDevice()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pVertexShader);
+
+		if (FAILED(hr)) {
+			_com_error error(hr);
+			std::wstringstream ss;
+			ss << "Could not Create Vertex Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());
+			return false;
+		}
+
+		pDeviceContext->VSSetShader(pVertexShader, nullptr, 0);
+		vert_path.clear();
+
+		//////////////***************** END VERTEX SHADER *****************/////////////////////
+		#pragma endregion
+
+		const D3D11_INPUT_ELEMENT_DESC inputLayout[]{
+			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+
+		int numElements = ARRAYSIZE(inputLayout);
+
+
+		hr = GetDevice()->CreateInputLayout(inputLayout, numElements, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
+
+		if (FAILED(hr)) {
+			std::wstringstream ss;
+			_com_error err(hr);
+			ss << "[ERROR]\n" << "Could Not Initilize Input Layout.\n" << "Error Description:\n" << err.ErrorMessage() << std::endl;
+			SH_DEBUGGER_FATAL(ss.str().c_str());// <-- KINDA ANNOYING... CREATE A OVERLOAD FOR USE WITH STD::STRINGS
+			return false;
+
+		}
+
+		pDeviceContext->IASetInputLayout(pInputLayout);
+
 
 		const Vertex vertices[]{
-			// x      y      z        r   g    b     a 
-			{ 0.0f,  0.5f, 0.5f,	255, 0, 0, 255},
-			{ 0.5f, -0.5f, 0.5f,	0, 255, 0, 255},
-			{-0.5f, -0.5f, 0.5f,	0, 0, 255, 255},
+			// x      y      z        r    g    b    a 
+			{ 1.0f,  1.0f, 1.0f,	  255, 0, 0, 255},  // [0] +-------
+			{ 1.0f, -1.0f, 1.0f,	  255, 0, 0, 255},  // [1] | FRONT
+			{-1.0f, -1.0f, 1.0f,	  255, 0, 0, 255},  // [2] | 
+			{-1.0f,  1.0f, 1.0f,	  255, 0, 0, 255},  // [3] +------- 
+
+			{-1.0f,  1.0f, -1.0f,	  0, 255, 0, 255}, // [4] +-------
+			{-1.0f, -1.0f, -1.0f,	  0, 255, 0, 255}, // [5] | BACK
+			{ 1.0f, -1.0f, -1.0f,	  0, 255, 0, 255}, // [6] | 
+			{ 1.0f,  1.0f, -1.0f,	  0, 255, 0, 255}, // [7] +------- 
+
+			{-1.0f,  -1.0f, 1.0f,	  0, 0, 255, 255},  // [1] +-------  
+			{-1.0f,  -1.0f, -1.0f,	  0, 0, 255, 255},  // [3] |
+			{-1.0f,   1.0f, -1.0f,	  0, 0, 255, 255},  // [2] | LEFT
+			{-1.0f,   1.0f, 1.0f,	  0, 0, 255, 255},  // [0] +-------
+
+
+			{ 1.0f, 1.0f,  1.0f,	255, 255, 0, 255}, // [4] +-------
+			{ 1.0f, 1.0f,  -1.0f,	255, 255, 0, 255}, // [5] | RIGHT
+			{ 1.0f, -1.0f, -1.0f,	255, 255, 0, 255}, // [6] | 
+			{ 1.0f, -1.0f, 1.0f,	255, 255, 0, 255}, // [7] +------- 
+
+
+			{ 1.0f, -1.0f, 1.0f,	255, 0, 255, 255},   // [0] +-------
+			{ 1.0f, -1.0f, -1.0f,	255, 0, 255, 255},   // [1] | BOTTOM
+			{-1.0f, -1.0f, -1.0f,	255, 0, 255, 255},   // [3] |
+			{-1.0f, -1.0f, 1.0f,	255, 0, 255, 255},   // [2] +-------  
+
+			{-1.0f, 1.0f,  1.0f,	  0, 255, 255, 255}, // [5] | TOP
+			{-1.0f, 1.0f, -1.0f,	  0, 255, 255, 255}, // [4] +-------
+			{ 1.0f, 1.0f, -1.0f,	  0, 255, 255, 255}, // [6] | 
+			{ 1.0f, 1.0f,  1.0f,	  0, 255, 255, 255},   // [7] +------- 
+
 		};
+
+		///////////***************  VERTEX BUFFER ***************////////////////
 
 		// Create Buffer Description
 		D3D11_BUFFER_DESC vBuff_desc;
@@ -190,14 +286,14 @@ namespace ShadowEngine {
 		vBuff_resourceData.pSysMem = vertices; // set the vertices to the subResourceData
 
 		// Create Buffer
-		HRESULT hr = pDevice->CreateBuffer(&vBuff_desc, &vBuff_resourceData, &pVertexBuffer);
+		hr = GetDevice()->CreateBuffer(&vBuff_desc, &vBuff_resourceData, &pVertexBuffer);
 
 		if (FAILED(hr)) {
 			std::wstringstream ss;
 			_com_error err(hr);
 			ss << "[ERROR]\n" << "Could Not Create Vertex Buffer.\n" << "Error Description:\n" << err.ErrorMessage() << std::endl;
 			SH_DEBUGGER_FATAL(ss.str().c_str());
-			//return false;
+			return false;
 
 		}
 
@@ -206,15 +302,35 @@ namespace ShadowEngine {
 		UINT offset = 0;
 		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 
+		///////////*************  END VERTEX BUFFER *************////////////////
 
 
-		// INDEX BUFFER
+		///////////***************  INDEX BUFFER ***************////////////////
 
-		const unsigned short indices[]{
-			0, 1, 2
+		const unsigned short indices[]
+		{
+			// FRONT
+			0, 1, 2, 
+			0, 2, 3, 
+			// BACK
+			4, 5, 6, 
+			4, 6, 7,
+			// LEFT 
+			8, 9, 10,
+			8, 10, 11,
+			// RIGHT 
+			12, 13, 14,
+			12, 14, 15, 
+			// BOTTOM
+			16, 17, 18,
+			16, 18, 19,
+			// TOP
+			20, 21, 22, 
+			20, 22, 23  
 		};
-		D3D11_BUFFER_DESC indexBuffer_desc = {0};
-		
+
+		D3D11_BUFFER_DESC indexBuffer_desc = { 0 };
+
 
 		indexBuffer_desc.Usage = D3D11_USAGE_DEFAULT;
 		indexBuffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -226,103 +342,20 @@ namespace ShadowEngine {
 
 
 		// Create SubresourceData
-		D3D11_SUBRESOURCE_DATA iBuff_resoruceData = {0};
+		D3D11_SUBRESOURCE_DATA iBuff_resoruceData = { 0 };
 		iBuff_resoruceData.pSysMem = indices; // set the vertices to the subResourceData
 
-		hr = pDevice->CreateBuffer(&indexBuffer_desc, &iBuff_resoruceData, &pIndexBuffer);
+		hr = GetDevice()->CreateBuffer(&indexBuffer_desc, &iBuff_resoruceData, &pIndexBuffer);
 
 
 		pDeviceContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
-		// Get Shaders
-
-		//////////////***************** PIXEL SHADER *****************/////////////////////
-	
-		std::wstringstream pixel_path;
-		pixel_path << GetExePath() << L"\\PixelShader.cso";
-		hr = D3DReadFileToBlob(pixel_path.str().c_str(), &pBlob);
-
-		if (FAILED(hr)) {
-			_com_error error(hr);
-			std::wstringstream ss;
-			ss << "Could not find Pixel Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
-			SH_DEBUGGER_FATAL(ss.str().c_str());
-			//return false;
-		}
-
-		hr = pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pPixelShader);
-
-
-
-		if (FAILED(hr)) {
-			_com_error error(hr);
-			std::wstringstream ss;
-
-			ss << "Could not Create Pixel Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
-			SH_DEBUGGER_FATAL(ss.str().c_str());
-			//return false;
-		}
-
-		pDeviceContext->PSSetShader(pPixelShader, nullptr, 0);
-
-		//////////////***************** END PIXEL SHADER *****************/////////////////////
-
-
-		//////////////***************** VERTEX SHADER *****************/////////////////////
-		std::wstringstream vert_path;
-		vert_path << GetExePath() << L"\\VertexShader.cso";
-
-		hr = D3DReadFileToBlob(vert_path.str().c_str(), &pBlob);
-
-		if (FAILED(hr)) {
-			_com_error error(hr);
-			std::wstringstream ss;
-
-			ss << "Could not find Vertex Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
-			SH_DEBUGGER_FATAL(ss.str().c_str());
-
-			//return false;
-		}
-
-		hr = pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), NULL, &pVertexShader);
-
-		if (FAILED(hr)) {
-			_com_error error(hr);
-			std::wstringstream ss;
-			ss << "Could not Create Vertex Shader\n" << "Error Description: " << error.ErrorMessage() << std::endl;
-			SH_DEBUGGER_FATAL(ss.str().c_str());
-			//return false;
-		}
-
-		pDeviceContext->VSSetShader(pVertexShader, nullptr, 0);
-		vert_path.clear();
-		
-		//////////////***************** END VERTEX SHADER *****************/////////////////////
-		const D3D11_INPUT_ELEMENT_DESC inputLayout[]{
-			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-
-		int numElements = ARRAYSIZE(inputLayout);
-
-
-		hr = pDevice->CreateInputLayout(inputLayout, numElements, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
-
-		if (FAILED(hr)) {
-			std::wstringstream ss;
-			_com_error err(hr);
-			ss << "[ERROR]\n" << "Could Not Initilize Input Layout.\n" << "Error Description:\n" << err.ErrorMessage() << std::endl;
-			SH_DEBUGGER_FATAL(ss.str().c_str());// <-- KINDA ANNOYING... CREATE A OVERLOAD FOR USE WITH STD::STRINGS
-			//return false;
-
-		}
-
-		pDeviceContext->IASetInputLayout(pInputLayout);
-
-		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
-
+		///////////*************  END INDEX BUFFER *************////////////////
 
 		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+
 
 		//////////////***************** END INPUT ASSEMBLER *****************/////////////////////
 
@@ -330,19 +363,170 @@ namespace ShadowEngine {
 
 		//////////////***************** RASTERIZER STAGE *****************/////////////////////
 
+
+		SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_BACK);
+
+
+	
+		//////////////***************** END RASTERIZE STAGE *****************/////////////////////
+
+
+		//////////////***************** OUTPUT MERGER *****************/////////////////////
+
+		D3D11_TEXTURE2D_DESC depthStencilDesc = {0};
+		depthStencilDesc.Width = width;
+		depthStencilDesc.Height = height;
+		depthStencilDesc.MipLevels = 1;
+		depthStencilDesc.ArraySize = 1;
+		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilDesc.SampleDesc = sample_desc;
+
+		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthStencilDesc.CPUAccessFlags = 0;
+		depthStencilDesc.MiscFlags = 0;
+
+		hr = GetDevice()->CreateTexture2D(&depthStencilDesc, NULL, &pDepthStencilBuffer);
+		if (FAILED(hr)) {
+			SH_DEBUGGER_FATAL("COULD NOT INITILIZE DEPTH STENCIL BUFFER");
+			return false;
+		}
+
+		hr = GetDevice()->CreateDepthStencilView(pDepthStencilBuffer, NULL, &pDepthStencilView);
+		if (FAILED(hr)) {
+			SH_DEBUGGER_FATAL("COULD NOT INITILIZE DEPTH STENCIL View");
+			return false;
+		}
+		
+		// Create Render Target
+		GetDevice()->CreateRenderTargetView(backBuffer, NULL, &pRenderTargetView);
+		backBuffer->Release();
+
+
+
+		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
+
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
-		viewport.Width = pWindow->GetClientSize().left + pWindow->GetClientSize().right;
-		viewport.Height = pWindow->GetClientSize().top + pWindow->GetClientSize().bottom;
+		viewport.Width = width;
+		viewport.Height = height;
+
 		pDeviceContext->RSSetViewports(1, &viewport);
 
-		//////////////***************** END RASTERIZE STAGE *****************/////////////////////
-		//SH_DEBUGGER_INFO("End of Render Test");
+		//////////////***************** END OUTPUT MERGER *****************/////////////////////
+	
 
-		pDeviceContext->DrawIndexed((UINT)std::size(indices), 0, 0);
+
+
+		D3D11_BUFFER_DESC connstantBufferDesc = { 0 };
+		connstantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		connstantBufferDesc.ByteWidth = sizeof(DirectX::XMMATRIX);
+		connstantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		connstantBufferDesc.CPUAccessFlags = 0;
+		connstantBufferDesc.MiscFlags = 0;
+
+		hr = GetDevice()->CreateBuffer(&connstantBufferDesc, NULL, &pConstantBuffer);
+		if (FAILED(hr)) {
+			SH_DEBUGGER_ERR("Could not Create Constant Buffer");
+			return false;
+		}
+		//p = ;
+		//u = 
+		//t = 
+		
+		DirectX::XMVECTOR camPos	= DirectX::XMVectorSet(0.0f, 3.0f, -8.5f, 0.0f); // moves back 0.5f
+		DirectX::XMVECTOR camUp		= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		DirectX::XMVECTOR camTarget = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);  // look at 0,0,0 
+
+		view = DirectX::XMMatrixLookAtRH(camPos, camTarget, camUp);
+		projection = DirectX::XMMatrixPerspectiveFovRH(degreesToRadians(60.0f), (float)width / height, 0.01f, 1000.0f);
+
+		SH_DEBUGGER_LOG("DirectX 11 Initilization Success");
+		return true;
+	}
+
+	void Graphics::ClearBuffer(float r, float g, float b)
+	{
+		float clear_color[] = { r , g , b , 1.0f };
+		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clear_color);
+		pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	}
+
+	void Graphics::Update(float dt)
+	{
+		UpdateTest(dt);
+	}
+
+	
+
+
+	void Graphics::UpdateTest(float dt)
+	{
+		
+		world = DirectX::XMMatrixIdentity();
+		static float rot;
+		static float pos;
+
+		// cube 0
+		rot = sin(dt) / 2.0;
+		pos = sin(dt) / 2.0;
+		pos *= 10;
+		rot *= 100;
+		world =
+			DirectX::XMMatrixRotationRollPitchYaw(degreesToRadians(rot), degreesToRadians(rot), degreesToRadians(rot)) *
+			DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f) *
+			DirectX::XMMatrixTranslation(pos, 0, -2.0f);
+
+		wvp = world * view * projection;
+
+		cbPerObjectBuffer.WVP = DirectX::XMMatrixTranspose(wvp);
+
+		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &cbPerObjectBuffer, 0, 0);
+
+		pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+		
+		pDeviceContext->DrawIndexed(36, 0, 0);
+
+
+		// CUBE 2
+		rot = sin(dt) / 2.0 + 2.0f;
+		rot *= 100;
+
+		world =
+			DirectX::XMMatrixRotationRollPitchYaw(degreesToRadians(rot), degreesToRadians(rot), degreesToRadians(rot)) *
+			DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f) *
+			DirectX::XMMatrixTranslation(2.0f, 0.0f, 0.0f);
+
+		wvp = world * view * projection;
+
+		cbPerObjectBuffer.WVP = DirectX::XMMatrixTranspose(wvp);
+
+		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &cbPerObjectBuffer, 0, 0);
+
+		pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+
+		pDeviceContext->DrawIndexed(36, 0, 0);
+
+		// CUBE 3
+		rot = sin(dt) / 2.0 + 2.0f;
+		rot *= 500;
+
+		world =
+			DirectX::XMMatrixRotationRollPitchYaw(degreesToRadians(rot), degreesToRadians(rot), degreesToRadians(rot)) *
+			DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f) *
+			DirectX::XMMatrixTranslation(-2.0f, 0.0f, 0.0f);
+
+		wvp = world * view * projection;
+
+		cbPerObjectBuffer.WVP = DirectX::XMMatrixTranspose(wvp);
+
+		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &cbPerObjectBuffer, 0, 0);
+
+		pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+
+		pDeviceContext->DrawIndexed(36, 0, 0);
 
 	}
 
@@ -365,7 +549,7 @@ namespace ShadowEngine {
 	void Graphics::EndFrame()
 	{
 		HRESULT hr;
-		if (FAILED(hr = pSwapChain->Present(1u, 0))) {
+		if (FAILED(hr = GetSwapChain()->Present(1u, 0))) {
 			SH_DEBUGGER_FATAL("FAILED TO FLIP BUFFERS");
 		}
 		//SH_DEBUGGER_INFO("RENDER FINISHED");
@@ -375,19 +559,19 @@ namespace ShadowEngine {
 	void Graphics::Cleanup()
 	{
 		// Clean up COM objects
-		pSwapChain->Release();
+		GetSwapChain()->Release();
+		GetDevice()->Release();
 		pDeviceContext->Release();
-		pDevice->Release();
 		pRenderTargetView->Release();
 		pVertexBuffer->Release();
 		pVertexShader->Release();
 		pPixelShader->Release();
-
+		pDepthStencilBuffer->Release();
+		pDepthStencilView->Release();
 		pBlob->Release();
-		//pixelShaderByteCode->Release();
-
 		pInputLayout->Release();
-
+		pRasterizerState->Release();
+		pConstantBuffer->Release();
 	}
 
 	IDXGISwapChain* Graphics::GetSwapChain()
@@ -418,6 +602,30 @@ namespace ShadowEngine {
 	ID3D11Buffer* Graphics::GetVertexBuffer()
 	{
 		return pVertexBuffer;
+	}
+
+	ID3D11RasterizerState* Graphics::GetRasterizerState()
+	{
+		return pRasterizerState;
+	}
+
+	bool Graphics::SetRasterizerState(D3D11_FILL_MODE fill_mode, D3D11_CULL_MODE cull_mode)
+	{
+		D3D11_RASTERIZER_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
+		desc.FillMode = fill_mode;
+		desc.FillMode = fill_mode;
+		desc.CullMode = cull_mode;
+
+		HRESULT hr = GetDevice()->CreateRasterizerState(&desc, &pRasterizerState);
+		
+		if (FAILED(hr)) {
+			SH_DEBUGGER_ERR("COULD NOT SWITCH RASTERIZER STATE");
+			return false;
+		}
+		
+		pDeviceContext->RSSetState(pRasterizerState);
+		return true;
 	}
 
 }
