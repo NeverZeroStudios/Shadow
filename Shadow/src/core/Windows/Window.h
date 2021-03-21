@@ -5,14 +5,15 @@
 #include "BaseWindow.h"
 #include <optional>
 
-#include "../../data_structures/Queue.h"
-
 #include "../Input/Keyboard.h"
 #include "../Input/Mouse.h"
+
+#include "../../data_structures/Queue.h"
 
 #include "../Events/Event.h"
 #include "../Events/KeyEvents.h"
 #include "../Events/MouseEvents.h"
+#include "../Graphics2D/Graphics2D.h"
 
 namespace ShadowEngine {
 
@@ -21,25 +22,31 @@ namespace ShadowEngine {
 		virtual BOOL Create(PCWSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle = 0, int x = 0, int y = 0, int nWidth = 1280, int nHeight = 720, HWND hWndParent = 0, HMENU hMenu = 0) override;
 		virtual PCWSTR ClassName() const override;
 		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-		
-		static std::optional<int> ProcessMessages();
 
-		bool InitEventsQueue(DataStructures::Queue<Events::Event*>& queue);
-		bool InitKeyboard(Input::Keyboard& kb);
-		bool InitMouse(Input::Mouse& mo);
+		static std::optional<int> ProcessMessages();
 
 		RECT GetWindowSize();
 		RECT GetClientSize();
 
+		DataStructures::Queue<Events::Event*> GetEvents();
+
+
+		Input::Keyboard GetKeyboard();
+		Input::Mouse GetMouse();
+
+	
+
 	private:
+
+		Graphics2D gfx;
+
+		Input::Keyboard keyboard;
+		Input::Mouse mouse;
+
+		DataStructures::Queue<Events::Event*> _events;
+
 		RECT windowRect = {0};
 		RECT clientRect = {0};
 
-		// ptr to the applications event queue so we can populate it with WMessges
-		DataStructures::Queue<Events::Event*>* events;
-
-		// ptr to the applications keyboard so that we can track the keyboard states clientside
-		Input::Keyboard* keyboard;
-		Input::Mouse* mouse;
 	};
 }

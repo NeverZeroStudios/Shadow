@@ -23,46 +23,6 @@ namespace ShadowEngine {
 			return f.substr(0, f.find_last_of(L"\\/"));
 			
 		}
-		#define NOW  
-		Timer::Timer()
-		{
-			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-			last = now;
-		}
-
-		Timer::~Timer()
-		{
-		}
-
-		float Timer::Mark()
-		{
-			const auto old = last;
-			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-			last = now;
-			std::chrono::duration<float> frameTime = last - old;
-			return frameTime.count();
-		}
-
-		float Timer::Peek()
-		{
-			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-			return std::chrono::duration<float>(now - last).count();
-		}
+		
 	}
 }
-
-
-
-/*
-	std::wstring GetExeFileName()
-	{
-		
-	}
-
-	std::wstring GetExePath()
-	{
-		
-	}
-
-
-*/

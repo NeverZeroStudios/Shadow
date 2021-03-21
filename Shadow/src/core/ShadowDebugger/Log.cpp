@@ -28,8 +28,10 @@ namespace ShadowEngine {
 
 			ForegroundColor(fg_color);
 			BackgroundColor(bg_color);
+			std::wstringstream ss;
+			ss  << sender << ": " << message << std::endl;
+			OutputDebugStringW(ss.str().c_str());
 
-			std::cout << sender << ": "<< message << std::endl;
 			
 			ResetColors();
 		}
@@ -55,8 +57,9 @@ namespace ShadowEngine {
 
 			ForegroundColor(fg_color);
 			BackgroundColor(bg_color);
-
-			std::wcout << msg << std::endl;
+			std::wstringstream ss;
+			ss << sender <<  ": " << msg << std::endl;
+			OutputDebugStringW(ss.str().c_str());
 
 			ResetColors();
 		}

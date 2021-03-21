@@ -8,21 +8,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <chrono> SHADOW_API 
 
 namespace ShadowEngine {
 	namespace Utilities {
-
-		class SHADOW_API Timer {
-		public:
-			Timer();
-			~Timer();
-			float Mark();
-			float Peek();
-		private:
-			std::chrono::steady_clock::time_point last;
-
-		};
 
 		class SHADOW_API FileStructure {
 		public:

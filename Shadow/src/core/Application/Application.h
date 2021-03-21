@@ -2,16 +2,18 @@
 
 #include "../Core.h"
 
-#include "../Windows/Window.h"
 #include "../ShadowDebugger/Log.h"
-#include "../Graphics/Graphics.h"
+
+#include "../Windows/Window.h"
+
+
 #include "../Input/Keyboard.h"
+#include "../Input/Mouse.h"
 
 // Event handling
-#include "../../data_structures/Queue.h"
 #include "../Events/Event.h"
 #include "../../util/Utilities.h"
-
+#include "../Graphics2D/Graphics2D.h"
 
 namespace ShadowEngine {
 
@@ -20,20 +22,21 @@ namespace ShadowEngine {
 	public:
 		Application();
 		virtual ~Application();
-
+		
 		virtual int Run() = 0;
+
+	protected:
+		Window window;
+
+		Input::Keyboard Keyboard();
+		Input::Mouse Mouse();
+
 		void ComposeFrame();
 		void ProcessEvents();
-	protected:
-		Window _window;
-		Graphics _gfx;
-		Input::Keyboard Keyboard;
-		Input::Mouse Mouse;
-		Utilities::Timer timer;
 
-
-		DataStructures::Queue<Events::Event*> _events;
-
+	private:
+		bool Init();
+	
 	};
 
 	Application* CreateApplication();

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\Graphics2D\Graphics2D.h" />
     <ClInclude Include="src\core\Input\Mouse.h" />
     <ClInclude Include="src\core\Events\MouseEvents.h" />
     <ClInclude Include="src\core\Events\Event.h" />
@@ -20,7 +21,6 @@
     <ClInclude Include="src\core\Application\Application.h" />
     <ClInclude Include="src\core\Core.h" />
     <ClInclude Include="src\core\Application\EntryPoint.h" />
-    <ClInclude Include="src\core\Graphics\Graphics.h" />
     <ClInclude Include="src\core\ShadowDebugger\Log.h" />
     <ClInclude Include="Shadow.h" />
     <ClInclude Include="src\core\Windows\BaseWindow.h" />
@@ -28,6 +28,7 @@
     <ClInclude Include="src\util\Utilities.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\Graphics2D\Graphics2D.cpp" />
     <ClCompile Include="src\core\Input\Mouse.cpp" />
     <ClCompile Include="src\core\Events\MouseEvents.cpp" />
     <ClCompile Include="src\core\Events\Event.cpp" />
@@ -35,24 +36,17 @@
     <ClCompile Include="src\data_structures\Queue.cpp" />
     <ClCompile Include="src\core\Input\Keyboard.cpp" />
     <ClCompile Include="src\core\Application\Application.cpp" />
-    <ClCompile Include="src\core\Graphics\Graphics.cpp" />
     <ClCompile Include="src\core\ShadowDebugger\Log.cpp" />
     <ClCompile Include="src\core\Windows\BaseWindow.cpp" />
     <ClCompile Include="src\core\Windows\Window.cpp" />
     <ClCompile Include="src\util\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\core\Graphics\PixelShader.hlsl">
+    <FxCompile Include="src\core\Graphics2D\Shaders\Unlit.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="src\core\Graphics\VertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> $(WindowsSDK_IncludePath) </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'"> $(WindowsSDK_IncludePath) </AdditionalIncludeDirectories>
     </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
