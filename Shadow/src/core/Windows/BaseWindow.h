@@ -43,14 +43,18 @@ namespace ShadowEngine {
             7. Height       int
             8. Parent       HWND
             9. Menu         HMENU */
+
         virtual BOOL Create( PCWSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle = 0, int x = 0, int y = 0, int nWidth = 1280, int nHeight = 720, HWND hWndParent = 0, HMENU hMenu = 0 )
         {
             WNDCLASSEX wc = { 0 };
 
+            wc.style = CS_HREDRAW | CS_VREDRAW;
             wc.lpfnWndProc = _DERIVED_::WindowProc;
             wc.hInstance = GetModuleHandle(NULL);
             wc.lpszClassName = ClassName();
-            wc.style = CS_HREDRAW | CS_VREDRAW;
+            wc.cbClsExtra = 0;
+            wc.cbWndExtra = sizeof(LONG_PTR);
+            //wc.hCursor = LoadCursorW(NULL, IDC_ARROW);
 
             RegisterClassEx(&wc);
 
@@ -69,6 +73,8 @@ namespace ShadowEngine {
         virtual PCWSTR  ClassName() const = 0;
         virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
+
+        HINSTANCE hInst;
         HWND _hWnd;
     };
 

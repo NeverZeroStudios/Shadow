@@ -10,9 +10,7 @@ namespace ShadowEngine {
 
 		/// <summary>
 		/// ABC Event class to be inherited into ALL OTHER Events
-		/// 
 		/// </summary>
-
 		class SHADOW_API Event
 		{
 		public:

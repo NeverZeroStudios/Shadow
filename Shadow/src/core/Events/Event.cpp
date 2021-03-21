@@ -3,6 +3,7 @@
 
 namespace ShadowEngine {
 	namespace Events {
+
 		Event::Event() : _handled(false)
 		{
 		}
@@ -17,5 +18,6 @@ namespace ShadowEngine {
 			}
 			return *this;
 		}
+	
 	}
 }
